@@ -1,0 +1,46 @@
+build:
+  version: "0.0.1"
+
+ticketing:
+  message: "Welcome to Ticking microservice in QA environment."
+  contactDetails:
+    name: "Uexcel product Dev - Lead"
+    email: "uexcel@gmail.com"
+  call:
+    - 02830002082
+    - 90303999399
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: admin
+    password: ""
+  h2:
+    console:
+      enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: update
+    defer-datasource-initialization: true
+    database-platform: org.hibernate.dialect.H2Dialect
+
+server:
+  port: 8085
+
+eureka:
+  instance:
+    hostname: "localhost"
+  fetch-registry: true
+  register-with-eureka: true
+  client:
+    service-url:
+      defaultZone: "http://localhost:8070/eureka/"
+
+
+info:
+  app:
+    name: ticketing
+    description: "local transport system"
+    version: "0.0.1"
+

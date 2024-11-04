@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: ticketing
+  config:
+    import: "configserver:http://localhost:8075/"
+  profiles:
+    active: default
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: "guest"
+    password: "guest"
+
+management:
+  info:
+    env:
+      enabled: true
+
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      enabled: true
+      probes:
+        enabled: true
+
+  health:
+    liveness-state:
+      enabled: true
+    readiness-state: true
+
+    endpoint:
+      shutdown:
+        enabled: true
+
+endpoints:
+  shutdown:
+    enable: true
