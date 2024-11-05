@@ -2,6 +2,7 @@ package com.uexcel.customer.controller;
 
 import com.uexcel.customer.dto.ResponseDto;
 import com.uexcel.customer.dto.WalletDto;
+import com.uexcel.customer.dto.FundTransferDto;
 import com.uexcel.customer.entity.WalletTransaction;
 import com.uexcel.customer.exception.ExceptionFail;
 import com.uexcel.customer.service.IWalletService;
@@ -25,7 +26,7 @@ public class WalletController {
     public ResponseEntity<ResponseDto> fund(@RequestBody WalletTransaction wt) {
         iWalletService.fundWallet(wt);
         return ResponseEntity.ok()
-                .body(new ResponseDto("201","Wallet founded successfully."));
+                .body(new ResponseDto("201","Wallet funded successfully."));
     }
 
     @PutMapping("/wallet")
@@ -35,5 +36,12 @@ public class WalletController {
             return ResponseEntity.ok(true);
         }
         throw  new ExceptionFail("Fail");
+    }
+
+    @PutMapping("/transfer")
+    public ResponseEntity<ResponseDto> transfer(@RequestBody FundTransferDto ft) {
+        iWalletService.walletTransfer(ft);
+        return ResponseEntity.ok()
+                .body(new ResponseDto("200","fund transferred successfully."));
     }
 }

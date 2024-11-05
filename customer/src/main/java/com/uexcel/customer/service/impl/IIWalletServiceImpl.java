@@ -1,6 +1,7 @@
 package com.uexcel.customer.service.impl;
 
 import com.uexcel.customer.constants.ICustomerConstants;
+import com.uexcel.customer.dto.FundTransferDto;
 import com.uexcel.customer.dto.WalletDto;
 import com.uexcel.customer.entity.Wallet;
 import com.uexcel.customer.entity.WalletTransaction;
@@ -46,7 +47,7 @@ public class IIWalletServiceImpl implements IWalletService {
           walletTransaction.setAmount(wt.getAmount());
           walletTransaction.setWalletId(wt.getWalletId());
           walletTransaction.setAccountNumber(Long.toString(wt.getWalletId()));
-          walletTransaction.setTransactionType(T_TYPE);
+          walletTransaction.setTransactionType(T_TYPE_TICKET);
           walletTransaction.setAccountDescription(ACCT_DS);
           walletTransaction.setDate(new Date().toString());
           walletRepository.save(wallet);
@@ -72,6 +73,34 @@ public class IIWalletServiceImpl implements IWalletService {
         return true;
     }
 
+    /**
+     * @param ft - hold the two wallet IDs in involve
+     */
+    @Override
+    @Transactional
+    public void walletTransfer(FundTransferDto ft) {
+        if(ft.getAmount() <= 0){
+            throw new BadRequestException("Amount must be greater than 0:" +
+                    " "+ft.getAmount());
+        }
+        Wallet payer = getWallet(ft.getPayerWalletId());
+        payer.setBalance(payer.getBalance() - ft.getAmount());
+        WalletTransaction wPayer = new WalletTransaction();
+        wPayer.setAmount(-ft.getAmount());
+        wPayer.setAccountNumber(String.valueOf(ft.getPayerWalletId()));
+        wTransactionRepository.save(getWalletTransaction(ft.getPayerWalletId(),wPayer));
+        walletRepository.save(payer);
+
+        Wallet payee = getWallet(ft.getPayeeWalletId());
+        payee.setBalance(payee.getBalance() + ft.getAmount());
+        WalletTransaction wPayee = new WalletTransaction();
+        wPayee.setAmount(ft.getAmount());
+        wPayee.setAccountNumber(String.valueOf(ft.getPayerWalletId()));
+        wTransactionRepository.save(getWalletTransaction(ft.getPayeeWalletId(),wPayee));
+        walletRepository.save(payee);
+
+    }
+
     private Wallet getWallet(long walletId) {
         Wallet wallet = walletRepository.findById(walletId)
                 .orElseThrow(()-> new ResourceNotFoundException(
@@ -82,5 +111,13 @@ public class IIWalletServiceImpl implements IWalletService {
             throw new BadRequestException("Customer is deactivated");
         }
         return wallet;
+    }
+
+    private WalletTransaction getWalletTransaction(long walletId, WalletTransaction w) {
+        w.setDate(LocalDate.now().toString());
+        w.setAccountDescription(ACCT_DS);
+        w.setTransactionType(T_TYPE_TRANSFER);
+        w.setWalletId(walletId);
+        return w;
     }
 }

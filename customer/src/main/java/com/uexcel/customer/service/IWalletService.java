@@ -1,10 +1,11 @@
 package com.uexcel.customer.service;
 
+import com.uexcel.customer.dto.FundTransferDto;
 import com.uexcel.customer.dto.WalletDto;
 import com.uexcel.customer.entity.WalletTransaction;
 
 public interface IWalletService {
-    String ACCT_DS = "wallet", T_TYPE ="ticket";
+    String ACCT_DS = "wallet", T_TYPE_TICKET ="ticket",T_TYPE_TRANSFER ="transfer";
     /**
      * @param walletId - the customer wallet id
      * @return WalletDto info
@@ -23,5 +24,10 @@ public interface IWalletService {
      */
     boolean fundWallet(WalletTransaction wt);
 
+
+    /**
+     * @param ft  - hold the two wallet IDs in involve
+     */
+    void walletTransfer(FundTransferDto ft);
 
 }
