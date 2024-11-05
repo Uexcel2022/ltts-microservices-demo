@@ -1,6 +1,5 @@
 package com.eazybytes.ticketing.controller;
 
-import com.eazybytes.ticketing.constants.ITicketConstants;
 import com.eazybytes.ticketing.dto.ResponseDto;
 import com.eazybytes.ticketing.entity.Route;
 import com.eazybytes.ticketing.service.IRouteService;

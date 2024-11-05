@@ -25,6 +25,6 @@ public interface ICustomerService {
      * @param emailOrPhone - customer email or phone
      * @return - Returns boolean value indicating update successful or not
      */
-    public boolean deleteCustomer(String emailOrPhone);
+    boolean deleteCustomer(String emailOrPhone);
 
 }

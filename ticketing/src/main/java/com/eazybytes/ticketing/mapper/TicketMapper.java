@@ -6,7 +6,6 @@ import com.eazybytes.ticketing.entity.Ticket;
 import com.eazybytes.ticketing.service.ITicketService;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 
 public class TicketMapper {
