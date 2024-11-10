@@ -49,7 +49,7 @@ public class IBusRouteServiceImpl implements IBusRouteService {
             }
         }
 
-         if (busRouteIds.size() > 0) {
+         if (!busRouteIds.isEmpty()) {
           throw  new InvalidRouteBusIdException(busRouteIds);
          }
 

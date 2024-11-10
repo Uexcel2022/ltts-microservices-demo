@@ -1,6 +1,4 @@
 package com.uexcel.ticketing.dto;
-
-import com.uexcel.ticketing.entity.Route;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

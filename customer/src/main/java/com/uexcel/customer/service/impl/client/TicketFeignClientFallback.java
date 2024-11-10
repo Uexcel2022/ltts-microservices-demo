@@ -5,8 +5,6 @@ import com.uexcel.customer.dto.BuyTicketResponseDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @Component
 public class TicketFeignClientFallback implements TicketFeignClient{
 

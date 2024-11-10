@@ -86,7 +86,7 @@ public class GlobalExceptionHandler {
 
     public String getTimestamp(Date date) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSSZ");
-            return formatter.format(new Date());
+            return formatter.format(date);
         }
     }
 

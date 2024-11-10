@@ -46,7 +46,7 @@ public class IRouteServiceImpl implements IRouteService {
      */
     @Override
     public ResponseDto create(List<Route> routes) {
-        if (routes.size() == 0) {
+        if (routes.isEmpty()) {
             throw new InvalidInputException("Empty route list");
         }
         List<Route> rt = new ArrayList<>();
@@ -58,7 +58,7 @@ public class IRouteServiceImpl implements IRouteService {
             }
 
         }
-        if (rt.size() > 0) {
+        if (!rt.isEmpty()) {
             throw new RouteException(rt);
         }
 
@@ -73,7 +73,7 @@ public class IRouteServiceImpl implements IRouteService {
      */
     @Override
     public ResponseDto updatePrice(List<Route> routes) {
-        if (routes.size() == 0) {
+        if (routes.isEmpty()) {
             throw new InvalidInputException("Empty route list");
         }
         for (Route r : routes) {

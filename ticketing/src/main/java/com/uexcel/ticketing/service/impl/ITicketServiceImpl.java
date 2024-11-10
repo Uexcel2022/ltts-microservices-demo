@@ -123,7 +123,7 @@ public class ITicketServiceImpl implements ITicketService {
             throw  new ResourceNoFoundException("Ticket","customerId",customerId);
         }
         List<TicketDto> ticketDtoList = new ArrayList<>();
-        ticket.stream().forEach(tk -> {
+        ticket.forEach(tk -> {
             Route route = routeRepository.findByRouteId(tk.getRoutId());
             ticketDtoList.add(TicketMapper.mapToTicketDto(tk, route));
         });
