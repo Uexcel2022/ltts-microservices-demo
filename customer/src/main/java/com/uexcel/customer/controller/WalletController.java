@@ -7,6 +7,8 @@ import com.uexcel.customer.entity.WalletTransaction;
 import com.uexcel.customer.exception.ExceptionFail;
 import com.uexcel.customer.service.IWalletService;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,9 +19,13 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin("http://localhost:8080")
 public class WalletController {
     private final IWalletService iWalletService;
+    private final Logger logger = LoggerFactory.getLogger(WalletController.class.getName());
     @GetMapping("/wallet")
-    public ResponseEntity<WalletDto> fetchWallet(@RequestParam long walletId) {
-        return ResponseEntity.ok(iWalletService.fetchWallet(walletId));
+    public ResponseEntity<WalletDto> fetchWallet(@RequestParam long walletId,
+                                                 @RequestHeader("saferideCorrelationId") String correlationId) {
+        WalletDto walletDto = iWalletService.fetchWallet(walletId);
+        logger.debug("fetching wallet: saferideCorrelation-id found: {}", correlationId);
+        return ResponseEntity.ok(walletDto);
     }
 
     @PostMapping("/wallet")
@@ -30,11 +36,14 @@ public class WalletController {
     }
 
     @PutMapping("/wallet")
-    public ResponseEntity<Boolean> update(@RequestBody WalletTransaction wt) {
+    public ResponseEntity<Boolean> update(@RequestBody WalletTransaction wt,
+                                          @RequestHeader("saferideCorrelationId") String correlationId) {
       boolean success =  iWalletService.updateWallet(wt);
         if(success){
+            logger.debug("Updating wallet: success: saferideCorrelation-id found {}", correlationId);
             return ResponseEntity.ok(true);
         }
+        logger.debug("Updating wallet: fail: saferideCorrelation-id found {}", correlationId);
         throw  new ExceptionFail("Fail");
     }
 

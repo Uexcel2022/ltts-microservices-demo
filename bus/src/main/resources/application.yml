@@ -38,4 +38,6 @@ management:
 endpoints:
   shutdown:
     enabled: true
-
+logging:
+  level:
+    com.uexcel: DEBUG

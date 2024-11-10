@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-
 @Setter @Getter
 public class TicketDto {
     private String Name;
