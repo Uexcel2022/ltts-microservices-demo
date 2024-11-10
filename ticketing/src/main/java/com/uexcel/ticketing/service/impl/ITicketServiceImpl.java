@@ -10,6 +10,7 @@ import com.uexcel.ticketing.repositorty.RouteRepository;
 import com.uexcel.ticketing.repositorty.TicketRepository;
 import com.uexcel.ticketing.service.ITicketService;
 import com.uexcel.ticketing.service.impl.client.CustomerFeignClient;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -35,10 +36,13 @@ public class ITicketServiceImpl implements ITicketService {
     @Override
     @Transactional
     public BuyTicketResponseDto createTicket(BuyTicketDto buyTicketDto, String correlationId) {
-        Route route = routeRepository.findById(buyTicketDto.getRouteId())
-                .orElseThrow(()->new ResourceNoFoundException(
-                        "Route","routeId",Long.toString(buyTicketDto.getRouteId()))
-                );
+        Route route = routeRepository.findByRouteId(buyTicketDto.getRouteId());
+        if (route == null) {
+            return new BuyTicketResponseDto(new Date(),
+                    404,"Not Found",
+                    "Route not found for the given input data routeId: "
+                            + buyTicketDto.getRouteId(),null);
+        }
 
         ResponseEntity<WalletDto> w = customerFeignClientFallback
                 .fetchWallet(buyTicketDto.getWalletId(),correlationId);

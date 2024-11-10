@@ -2,6 +2,7 @@ package com.uexcel.ticketing.controller;
 
 import com.uexcel.ticketing.dto.*;
 import com.uexcel.ticketing.service.ITicketService;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -23,11 +24,16 @@ public class TicketController {
     }
 
     @PostMapping("/create-ticket")
+    @RateLimiter(name  ="createTicket",fallbackMethod = "createTicketFallBack")
     public ResponseEntity<BuyTicketResponseDto> createTicket(@RequestBody BuyTicketDto buyTicketDto,
                                                                    @RequestHeader("saferideCorrelationId") String correlationId) {
-        BuyTicketResponseDto buyTicketResponseDtoList = iTicketService.createTicket(buyTicketDto,correlationId);
+        BuyTicketResponseDto bt = iTicketService.createTicket(buyTicketDto,correlationId);
         logger.debug("saferideCorrelation-id found {}", correlationId);
-        return ResponseEntity.status(200).body(buyTicketResponseDtoList);
+        return ResponseEntity.status(bt.getStatus()).body(bt);
+    }
+
+    private ResponseEntity<String> createTicketFallBack(Throwable throwable) {
+        return ResponseEntity.status(429).body("Too many requests");
     }
 
 
