@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: gatewayserver
+  config:
+    import: "configserver:http://localhost:8075/"
+
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          lower-case-service-id: true
+logging:
+  level:
+    com.uexcel: DEBUG
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-size: 10
+        permitted-number-of-calls-in-half-open-state: 2
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 1000
+
