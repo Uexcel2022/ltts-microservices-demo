@@ -3,7 +3,6 @@ package com.uexcel.ticketing.controller;
 import com.uexcel.ticketing.dto.CheckinDto;
 import com.uexcel.ticketing.dto.ResponseDto;
 import com.uexcel.ticketing.service.impl.CheckinServiceImpl;
-import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

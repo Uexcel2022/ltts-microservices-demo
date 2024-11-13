@@ -19,7 +19,7 @@ public class Route extends BaseEntity {
     private double price;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-    @JoinTable(name = "bus_route",
+    @JoinTable(name = "busRoute",
             joinColumns = {@JoinColumn(name = "routeId",referencedColumnName = "routeId")},
             inverseJoinColumns = {@JoinColumn(name = "busCode",referencedColumnName = "busCode")}
     )

@@ -1,6 +1,5 @@
 package com.uexcel.ticketing.controller;
 
-import com.uexcel.ticketing.dto.ResponseDto;
 import com.uexcel.ticketing.entity.Route;
 import com.uexcel.ticketing.service.impl.client.BusFeignClient;
 import lombok.AllArgsConstructor;

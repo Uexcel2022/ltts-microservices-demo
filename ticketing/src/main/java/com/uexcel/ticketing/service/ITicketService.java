@@ -1,6 +1,5 @@
 package com.uexcel.ticketing.service;
 
-import com.uexcel.ticketing.dto.BuyTicketDto;
 import com.uexcel.ticketing.dto.BuyTicketResponseDto;
 import com.uexcel.ticketing.dto.PostTicketDto;
 import com.uexcel.ticketing.dto.TicketDto;
