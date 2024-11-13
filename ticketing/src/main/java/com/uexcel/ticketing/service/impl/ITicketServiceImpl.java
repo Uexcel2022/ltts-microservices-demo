@@ -9,109 +9,62 @@ import com.uexcel.ticketing.mapper.TicketMapper;
 import com.uexcel.ticketing.repositorty.RouteRepository;
 import com.uexcel.ticketing.repositorty.TicketRepository;
 import com.uexcel.ticketing.service.ITicketService;
-import com.uexcel.ticketing.service.impl.client.CustomerFeignClient;
-import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+
 @Service
 @AllArgsConstructor
 public class ITicketServiceImpl implements ITicketService {
     private final TicketRepository ticketRepository;
     private final RouteRepository routeRepository;
-    private CustomerFeignClient customerFeignClientFallback;
+
+    private final Logger logger = LoggerFactory.getLogger(ITicketServiceImpl.class.getName());
 
     /**
-     * @param buyTicketDto  - holding customer and route information
+     * @param postTicketDto  - holding customer and route information
      * @param correlationId - logging trace id
      * @return - Returns ticked info
      */
 
     @Override
     @Transactional
-    public BuyTicketResponseDto createTicket(BuyTicketDto buyTicketDto, String correlationId) {
-        Route route = routeRepository.findByRouteId(buyTicketDto.getRouteId());
-        if (route == null) {
-            return new BuyTicketResponseDto(new Date(),
-                    404,"Not Found",
-                    "Route not found for the given input data routeId: "
-                            + buyTicketDto.getRouteId(),null);
-        }
-
-        ResponseEntity<WalletDto> w = customerFeignClientFallback
-                .fetchWallet(buyTicketDto.getWalletId(),correlationId);
-        if(w == null){
-
-          return   new BuyTicketResponseDto(new Date(),
-                    404,"Not Found","Wallet not found given input data walletId: "
-                    + buyTicketDto.getWalletId(),null);
-        }
-        WalletDto walletDto = w.getBody();
+    public BuyTicketResponseDto createTicket(PostTicketDto postTicketDto, String correlationId) {
 
      Ticket tk = ticketRepository
              .findByRoutIdAndCustomerIdAndStatusIgnoreCase (
-                     buyTicketDto.getRouteId(), walletDto.getCustomerId(),VALID);
-     if (tk != null) {
-         TicketDto ticketDto = new TicketDto();
-         ticketDto.setTicketId(tk.getTicketId());
-         ticketDto.setName(buyTicketDto.getName());
-         ticketDto.setAmount(tk.getAmount());
-         ticketDto.setExpiryDate(tk.getPurchasedDate().plusDays(366));
-         ticketDto.setPurchasedDate(tk.getPurchasedDate());
-         Route rt = routeRepository.findByRouteId(tk.getRoutId());
-         if (rt == null) {
-             return new BuyTicketResponseDto(new Date(),
-                     417,"Fail",
-                     "Failed to retrieve ticked origin and destination",ticketDto);
-         }
-         ticketDto.setDestination(rt.getDestination());
-         ticketDto.setOrigin(rt.getOrigin());
+                     postTicketDto.getRoutId(), postTicketDto.getCustomerId(),VALID);
 
+        TicketDto ticketDto = new TicketDto();
+
+     if (tk != null) {
+         logger.debug("createTicket:existing ticket: saferideCorrelation-id found: {}", correlationId);
          return new BuyTicketResponseDto(new Date(),
-                 302,"Found",
-                 "You have unused ticket on this routed",ticketDto);
+                 200,"Ok",
+                 "You have unused ticket on this routed",
+                 TicketMapper.mapToTicketDto(tk,ticketDto,postTicketDto));
      }
 
-        if(walletDto.getBalance() < route.getPrice()){
-            return new BuyTicketResponseDto(new Date(),
-                    400,"Bad Request",
-                    "You have insufficient balance",null);
-        }
+     Ticket newTicket = ticketRepository.save(TicketMapper.mapToTicket(new Ticket(),postTicketDto));
 
-        double newBal= walletDto.getBalance() - route.getPrice();
-        walletDto.setBalance(newBal);
+      if (newTicket != null && newTicket.getTicketId() != null){
+          logger.debug("createTicket: new ticket: saferideCorrelation-id found: {}", correlationId);
+          return new BuyTicketResponseDto(new Date(),
+                  201,"Created",
+                  "Ticket created successfully.",
+                  TicketMapper.mapToTicketDto(newTicket,ticketDto,postTicketDto));
 
-        //update wallet
-        WalletTransactionDto wt = new WalletTransactionDto();
-        wt.setAccountDescription("ticket");
-        wt.setAmount(-route.getPrice());
-        wt.setAccountNumber(Long.toString(walletDto.getWalletId()));
-        wt.setWalletId(walletDto.getWalletId());
-        wt.setTransactionType("ticket");
-        wt.setWalletId(walletDto.getWalletId());
-
-        ResponseEntity<Boolean>  success =
-       customerFeignClientFallback.updateWallet(wt,correlationId);
-
-        if(success != null && success.getBody()) {
-            Ticket ticket = new Ticket();
-            ticket.setCustomerId(walletDto.getCustomerId());
-            ticketRepository.save(TicketMapper.mapToTicket(ticket, route));
-            TicketDto ticketDto = TicketMapper.mapToTicketDto(ticket, route);
-            ticketDto.setName(buyTicketDto.getName());
-           return new BuyTicketResponseDto(new Date(),
-                    200,"OK","Request processed successfully.",ticketDto);
-
-        }
+      }
+        logger.debug("createTicket:failed: saferideCorrelation-id found: {}", correlationId);
          return new BuyTicketResponseDto(new Date(),
-                417,"Fail",
-                "Ticket payment processing failed. walletId: "+buyTicketDto.getWalletId(),null);
+                500,"Fail", "Fail: ",null);
     }
 
     /**
@@ -129,7 +82,7 @@ public class ITicketServiceImpl implements ITicketService {
         List<TicketDto> ticketDtoList = new ArrayList<>();
         ticket.forEach(tk -> {
             Route route = routeRepository.findByRouteId(tk.getRoutId());
-            ticketDtoList.add(TicketMapper.mapToTicketDto(tk, route));
+            ticketDtoList.add(TicketMapper.mapToTicketDto(tk, new TicketDto()));
         });
         return ticketDtoList;
     }

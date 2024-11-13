@@ -40,10 +40,10 @@ public class BusServiceImpl implements IBusService {
                 // Generating bus ID
                 String id = busRepository.findMaxId();
                 if(id==null){
-                    el.setBusId("busE101");
+                    el.setBusCode("busE101");
                 }else {
                     long max = Long.valueOf(id);
-                    el.setBusId("busE"+(100+(max+1)));
+                    el.setBusCode("busE"+(100+(max+1)));
                 }
                 busRepository.save(el);
             }else {
@@ -67,7 +67,7 @@ public class BusServiceImpl implements IBusService {
      */
     @Override
     public Bus fetchBusById(String busId) {
-        return busRepository.findByBusId(busId)
+        return busRepository.findByBusCode(busId)
                 .orElseThrow(()-> new ResourceNoFoundException("Bus","busId",busId)
         );
     }

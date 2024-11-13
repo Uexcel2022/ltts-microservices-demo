@@ -30,7 +30,7 @@ resilience4j:
       default:
         timeout-duration: 1000
         limit-refresh-period: 5000
-        limit-for-period: 2
+        limit-for-period: 3
 
 management:
   info:

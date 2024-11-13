@@ -1,6 +1,7 @@
 package com.uexcel.bus.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,8 +14,10 @@ public class Bus extends BaseEntity {
     @JsonIgnore
     private long id;
     @Column(nullable = false, unique = true)
-    private String busId;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String busCode;
     private String busName;
     private int capacity;
+
 }
 

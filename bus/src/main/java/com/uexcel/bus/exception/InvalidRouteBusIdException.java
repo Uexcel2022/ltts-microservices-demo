@@ -1,4 +1,4 @@
-package com.uexcel.ticketing.exception;
+package com.uexcel.bus.exception;
 
 import lombok.Getter;
 import lombok.Setter;

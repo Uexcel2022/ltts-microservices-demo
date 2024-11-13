@@ -2,7 +2,7 @@ package com.uexcel.ticketing.controller;
 
 import com.uexcel.ticketing.dto.ResponseDto;
 import com.uexcel.ticketing.entity.Route;
-import com.uexcel.ticketing.service.IRouteService;
+import com.uexcel.ticketing.service.impl.client.BusFeignClient;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,32 +18,13 @@ import java.util.List;
 public class RouteController {
 
     private final Logger logger = LoggerFactory.getLogger(RouteController.class);
-    private final IRouteService routeService;
+    private final BusFeignClient busFeignClintFallback;
     @GetMapping("fetch-routes")
     ResponseEntity<List<Route>> fetchAllRoutes(){
-        List<Route> routes = routeService.getAllRoutes();
         logger.debug("In route controller.fetchAllRoutes {}", "$$$$$$$$***********$$$");
-        return ResponseEntity.ok().body(routes);
-    }
-    @GetMapping("/fetch-route")
-    ResponseEntity<Route> fetchRute(@RequestParam long routeId){
-        Route route = routeService.getRouteById(routeId);
-        logger.debug("In route controller.fetchRute {}", "$$$$$$$$***********$$$");
-        return ResponseEntity.ok().body(route);
+        return null;
+
     }
 
-    @PostMapping("create-route")
-    public ResponseEntity<ResponseDto> createRoute(@RequestBody List<Route> routes){
-         ResponseDto responseDto = routeService.create(routes);
-        logger.debug("In route controller.createRoute {}", routes);
-        return ResponseEntity.status(201).body(responseDto);
-    }
-
-    @PutMapping("update-route")
-    public ResponseEntity<ResponseDto> updateRoute(@RequestBody List<Route> routes){
-        ResponseDto responseDto = routeService.updatePrice(routes);
-        logger.debug("In route controller.updateRoute {}", routes);
-        return ResponseEntity.status(200).body(responseDto);
-    }
 
 }

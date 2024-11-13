@@ -26,7 +26,7 @@ public interface IBusService {
     Bus fetchBusById(String busId);
 
     default boolean validateBus(Bus bus){
-        return bus.getBusName() != null && bus.getCapacity() > 0;
+        return bus.getBusName() != null && !bus.getBusName().isEmpty() && bus.getCapacity() > 0;
     }
 
 

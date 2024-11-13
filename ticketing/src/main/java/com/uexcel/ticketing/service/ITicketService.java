@@ -2,6 +2,7 @@ package com.uexcel.ticketing.service;
 
 import com.uexcel.ticketing.dto.BuyTicketDto;
 import com.uexcel.ticketing.dto.BuyTicketResponseDto;
+import com.uexcel.ticketing.dto.PostTicketDto;
 import com.uexcel.ticketing.dto.TicketDto;
 import com.uexcel.ticketing.entity.Ticket;
 import com.uexcel.ticketing.exception.InvalidInputException;
@@ -17,12 +18,12 @@ public interface ITicketService {
      String REFUND = "refunded", USE = "used", EXPIRE = "expired", VALID = "valid";
 
     /**
-     * @param buyTicketDto  - holding customer and route information
+     * @param postTicketDto  - will be bolding information to process ticket
      * @param correlationId - logging trace id
      * @return - Returns ticked and request status info
      */
 
-    BuyTicketResponseDto createTicket(BuyTicketDto buyTicketDto, String correlationId);
+    BuyTicketResponseDto createTicket(PostTicketDto postTicketDto, String correlationId);
 
     /**
      * @param customerId - customer ID

@@ -25,10 +25,10 @@ public class TicketController {
 
     @PostMapping("/create-ticket")
     @RateLimiter(name  ="createTicket",fallbackMethod = "createTicketFallBack")
-    public ResponseEntity<BuyTicketResponseDto> createTicket(@RequestBody BuyTicketDto buyTicketDto,
+    public ResponseEntity<BuyTicketResponseDto> createTicket(@RequestBody PostTicketDto postTicketDto,
                                                                    @RequestHeader("saferideCorrelationId") String correlationId) {
-        BuyTicketResponseDto bt = iTicketService.createTicket(buyTicketDto,correlationId);
-        logger.debug("saferideCorrelation-id found {}", correlationId);
+        BuyTicketResponseDto bt = iTicketService.createTicket(postTicketDto,correlationId);
+        logger.debug("createTicket: saferideCorrelation-id found {}", correlationId);
         return ResponseEntity.status(bt.getStatus()).body(bt);
     }
 

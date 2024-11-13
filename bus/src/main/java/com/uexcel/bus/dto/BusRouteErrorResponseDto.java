@@ -1,6 +1,5 @@
-package com.uexcel.ticketing.dto;
+package com.uexcel.bus.dto;
 
-import com.uexcel.ticketing.entity.BusRoute;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,6 +13,6 @@ public class BusRouteErrorResponseDto{
     private int status;
     private HttpStatus error;
     private String message;
-    private List<BusRoute> busRouteList;
+    private List<AddBusToRoute> addBusToRoute;
     private String apiPath;
 }

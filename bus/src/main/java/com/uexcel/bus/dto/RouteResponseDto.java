@@ -1,6 +1,6 @@
-package com.uexcel.ticketing.dto;
+package com.uexcel.bus.dto;
 
-import com.uexcel.ticketing.entity.Route;
+import com.uexcel.bus.entity.Route;
 import lombok.Getter;
 import lombok.Setter;
 

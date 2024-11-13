@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface BusRepository extends JpaRepository<Bus, Long> {
-    Optional<Bus> findByBusId(String busId);
+    Optional<Bus> findByBusCode(String busId);
     @Query(nativeQuery = true, value = "select max(id) from bus")
     String findMaxId();
 }

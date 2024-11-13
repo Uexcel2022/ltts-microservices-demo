@@ -1,7 +1,7 @@
 package com.uexcel.customer.service.impl.client;
 
-import com.uexcel.customer.dto.BuyTicketDto;
 import com.uexcel.customer.dto.BuyTicketResponseDto;
+import com.uexcel.customer.dto.PostTicketDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 public class TicketFeignClientFallback implements TicketFeignClient{
 
     @Override
-    public ResponseEntity<BuyTicketResponseDto> createTicket(BuyTicketDto buyTicketDto, String correlationId) {
+    public ResponseEntity<BuyTicketResponseDto> createTicket(PostTicketDto postTicketDto, String correlationId) {
         return null;
     }
 }

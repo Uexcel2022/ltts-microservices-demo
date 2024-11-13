@@ -1,5 +1,6 @@
 package com.uexcel.bus.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
@@ -16,6 +17,8 @@ import java.util.Date;
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 @Getter @Setter
+@JsonIgnoreProperties(value =
+        {"createdBy","createdDate", "updatedBy","updatedDate"})
 public class BaseEntity {
     @Column(updatable = false)
     @CreatedBy

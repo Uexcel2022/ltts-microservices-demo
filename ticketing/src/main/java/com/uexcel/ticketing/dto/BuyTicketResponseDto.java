@@ -1,16 +1,15 @@
 package com.uexcel.ticketing.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Date;
-@Data
+
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter @Setter @ToString
 public class BuyTicketResponseDto {
-    private Date date;
+    private Date timestamp;
     private int status;
     private String description;
     private String message;
