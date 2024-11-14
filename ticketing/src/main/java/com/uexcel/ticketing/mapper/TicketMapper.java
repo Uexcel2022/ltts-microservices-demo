@@ -1,6 +1,7 @@
 package com.uexcel.ticketing.mapper;
 
 import com.uexcel.ticketing.dto.PostTicketDto;
+import com.uexcel.ticketing.dto.Route;
 import com.uexcel.ticketing.dto.TicketDto;
 import com.uexcel.ticketing.entity.Ticket;
 import com.uexcel.ticketing.service.ITicketService;
@@ -9,8 +10,11 @@ import java.time.LocalDate;
 
 
 public class TicketMapper {
-  public static TicketDto mapToTicketDto(Ticket ticket,TicketDto dto) {
+  public static TicketDto mapToTicketDto(Ticket ticket, Route route, TicketDto dto) {
        dto.setTicketId(ticket.getTicketId());
+       dto.setRouteId(route.getRouteId());
+       dto.setOrigin(route.getOrigin());
+       dto.setDestination(route.getDestination());
        dto.setAmount(ticket.getAmount());
        dto.setPurchasedDate(ticket.getPurchasedDate());
        dto.setRouteId(ticket.getRoutId());

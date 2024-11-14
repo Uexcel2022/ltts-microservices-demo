@@ -10,6 +10,6 @@ public interface ICheckinService {
      * @param checkinDto  - will hold ticketId and busId
      * @return Returns response status and message
      */
-     ResponseDto checkinValidation(CheckinDto checkinDto);
+     ResponseDto checkinValidation(CheckinDto checkinDto,String correlationId);
 
 }

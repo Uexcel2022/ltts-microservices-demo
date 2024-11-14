@@ -8,45 +8,45 @@ import com.uexcel.customer.entity.WalletTransaction;
 import com.uexcel.customer.exception.ResourceNotFoundException;
 import com.uexcel.customer.repository.CustomerRepository;
 import com.uexcel.customer.repository.WalletRepository;
-import com.uexcel.customer.service.ICustomerService;
+import com.uexcel.customer.service.ITicketService;
 import com.uexcel.customer.service.IWalletService;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.Date;
 
-@Component
-@Getter @Setter
+
+@Service
 @AllArgsConstructor
-public class TicketService {
-    private final WalletRepository ticketRepository;
+public class ITicketServiceImpl implements ITicketService {
     private final CustomerRepository customerRepository;
     private WalletRepository walletRepository;
     private final IWalletService walletService;
-    private final ICustomerService customerService;
 
 
-    public BuyTicketResponseDto validateWalletBalance(Long walletId, Route route) {
+    /**
+     * @param walletId - wallet ID
+     * @param route    - will hold route information
+     * @return
+     */
+    @Override
+    public TicketResponseDto validateWalletBalance(Long walletId, Route route) {
         Wallet wallet = walletRepository.findById(walletId).orElse(null);
         if (wallet == null || wallet.getStatus().equals(ICustomerConstants.CUSTOMER_DEACTIVATED)) {
-            return new BuyTicketResponseDto(
+            return new TicketResponseDto(
                     getTime(), 404, "Not Found",
                     "Wallet not found given input data walletId: " + walletId, null, null);
         }
         if (wallet.getBalance() < route.getPrice()) {
-            return new BuyTicketResponseDto(
+            return new TicketResponseDto(
                     getTime(), 400, "Bad Request",
                     "Insufficient balance", null, null);
         }
 
-        BuyTicketResponseDto bt = pressingPayment(-route.getPrice(), wallet.getWalletId());
+        TicketResponseDto bt = pressingPayment(-route.getPrice(), wallet.getWalletId());
 
         if (bt == null) {
-            return new BuyTicketResponseDto(
+            return new TicketResponseDto(
                     getTime(), 200, "0k",
                     "Sufficient balance", wallet.getCustomerId(), null);
         }
@@ -54,24 +54,36 @@ public class TicketService {
     }
 
 
-     public BuyTicketResponseDto pressingPayment(double amount, long walletId){
+    /**
+     * @param amount   - ticket price
+     * @param walletId - wallet ID
+     * @return
+     */
+    @Override
+     public TicketResponseDto pressingPayment(double amount, long walletId){
         WalletTransaction wt = new WalletTransaction();
         wt.setAmount(amount);
         wt.setWalletId(walletId);
         boolean success = walletService.updateWallet(wt);
         if(!success){
             if(amount < 0) {
-                return new BuyTicketResponseDto(
+                return new TicketResponseDto(
                         getTime(), 417, "Fail",
                         "Payment processing fail", null, null);
             }
-            return new BuyTicketResponseDto(
+            return new TicketResponseDto(
                     getTime(), 417, "Fail",
                     "Refund processing fail", null, null);
         }
         return null;
      }
 
+    /**
+     * @param customerId - customer ID
+     * @param route      - will hold route information
+     * @return
+     */
+    @Override
     public PostTicketDto postTicket(String customerId,Route route) {
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow( ()-> new ResourceNotFoundException("Customer",customerId,customerId));
@@ -85,11 +97,5 @@ public class TicketService {
         postTicketDto.setPurchasedDate(LocalDate.now());
         return postTicketDto;
     }
-
-    public String getTime(){
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss SSZ");
-        return sdf.format(new Date());
-    }
-
 
 }

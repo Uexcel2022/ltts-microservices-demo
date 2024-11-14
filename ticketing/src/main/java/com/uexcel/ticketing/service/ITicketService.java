@@ -1,8 +1,7 @@
 package com.uexcel.ticketing.service;
 
-import com.uexcel.ticketing.dto.BuyTicketResponseDto;
+import com.uexcel.ticketing.dto.TicketResponseDto;
 import com.uexcel.ticketing.dto.PostTicketDto;
-import com.uexcel.ticketing.dto.TicketDto;
 import com.uexcel.ticketing.entity.Ticket;
 import com.uexcel.ticketing.exception.InvalidInputException;
 import com.uexcel.ticketing.repositorty.TicketRepository;
@@ -10,7 +9,6 @@ import com.uexcel.ticketing.repositorty.TicketRepository;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Date;
-import java.util.List;
 
 public interface ITicketService {
 
@@ -22,13 +20,13 @@ public interface ITicketService {
      * @return - Returns ticked and request status info
      */
 
-    BuyTicketResponseDto createTicket(PostTicketDto postTicketDto, String correlationId);
+    TicketResponseDto createTicket(PostTicketDto postTicketDto, String correlationId);
 
     /**
      * @param customerId - customer ID
      * @return Returns ticket info with TicketDto
      */
-    List<TicketDto> getTicket(String customerId);
+    TicketResponseDto getTicket(String customerId, String correlationId);
 
     /**
      * @param ticketId - ticket id

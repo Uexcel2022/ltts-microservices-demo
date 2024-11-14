@@ -25,9 +25,9 @@ public class TicketController {
 
     @PostMapping("/create-ticket")
     @RateLimiter(name  ="createTicket",fallbackMethod = "createTicketFallBack")
-    public ResponseEntity<BuyTicketResponseDto> createTicket(@RequestBody PostTicketDto postTicketDto,
-                                                                   @RequestHeader("saferideCorrelationId") String correlationId) {
-        BuyTicketResponseDto bt = iTicketService.createTicket(postTicketDto,correlationId);
+    public ResponseEntity<TicketResponseDto> createTicket(@RequestBody PostTicketDto postTicketDto,
+                                                          @RequestHeader("saferideCorrelationId") String correlationId) {
+        TicketResponseDto bt = iTicketService.createTicket(postTicketDto,correlationId);
         logger.debug("createTicket: saferideCorrelation-id found {}", correlationId);
         return ResponseEntity.status(bt.getStatus()).body(bt);
     }
@@ -38,8 +38,10 @@ public class TicketController {
 
 
     @GetMapping("/fetch-ticket")
-    public ResponseEntity<List<TicketDto>> getTicket(@RequestParam String customerId) {
-       return ResponseEntity.ok().body(iTicketService.getTicket(customerId));
+    public ResponseEntity<TicketResponseDto> getTicket(@RequestParam String customerId,
+                                                     @RequestHeader("saferideCorrelationId") String correlationId) {
+        logger.debug("getTicket: saferideCorrelation-id found {}", correlationId);
+       return ResponseEntity.ok().body(iTicketService.getTicket(customerId,correlationId));
     }
 
     @PutMapping("/cancel-ticket")
