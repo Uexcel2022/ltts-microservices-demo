@@ -14,18 +14,21 @@ import com.uexcel.ticketing.service.impl.client.BusFeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
+
+import static com.uexcel.ticketing.service.ITicketService.*;
+
 @Service
 public class CheckinServiceImpl implements ICheckinService {
     private final TicketRepository ticketRepository;
-    private final ITicketService ticketService;
     private final BusFeignClient busFeignClientFallback;
 
-    public CheckinServiceImpl(TicketRepository ticketRepository, ITicketService ticketService,
+    public CheckinServiceImpl(TicketRepository ticketRepository,
                               BusFeignClient busFeignClientFallback) {
         this.ticketRepository = ticketRepository;
-        this.ticketService = ticketService;
         this.busFeignClientFallback = busFeignClientFallback;
     }
     
@@ -39,13 +42,12 @@ public class CheckinServiceImpl implements ICheckinService {
                 .orElseThrow(()->new ResourceNoFoundException(
                         "Ticket","ticketId",checkinDto.getTicketId()));
 
-        ticketService.checkTicketStatus(ticket,ticketRepository);
+        checkTicketStatus(ticket,ticketRepository);
 
         /**
          * Get bus and check if the bus is enlisted on the route on the ticket
          * */
         ResponseEntity<Route> route = busFeignClientFallback.fetchRoute(ticket.getRoutId(),correlationId);
-
 
                 if(route==null){
                     throw new ResourceNoFoundException("Route","routeId",ticket.getTicketId());
@@ -67,4 +69,27 @@ public class CheckinServiceImpl implements ICheckinService {
     }
 
 
+    private void checkTicketStatus(Ticket ticket, TicketRepository ticketRepository) {
+
+        if(!ticket.getPurchasedDate().plusDays(366).isAfter(LocalDate.now())){
+            ticket.setStatus(EXPIRE);
+            ticketRepository.save(ticket);
+            throw  new InvalidInputException("Ticket has expired.");
+        }
+
+        if (ticket.getStatus().equalsIgnoreCase(USE)) {
+            throw new InvalidInputException(
+                    "The ticket was used on " + formatDate(ticket.getUsedDate()));
+        }
+
+        if (ticket.getStatus().equalsIgnoreCase(REFUND)) {
+            throw new InvalidInputException(
+                    "The ticket was refunded on " + formatDate(ticket.getUpdatedAt()));
+        }
+    }
+
+    private String formatDate(Date usedDate){
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSZ");
+        return formatter.format(usedDate);
+    }
 }

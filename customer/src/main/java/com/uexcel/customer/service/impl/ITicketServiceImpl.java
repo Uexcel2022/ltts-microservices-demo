@@ -35,12 +35,12 @@ public class ITicketServiceImpl implements ITicketService {
         if (wallet == null || wallet.getStatus().equals(ICustomerConstants.CUSTOMER_DEACTIVATED)) {
             return new TicketResponseDto(
                     getTime(), 404, "Not Found",
-                    "Wallet not found given input data walletId: " + walletId, null, null);
+                    "Wallet not found given input data walletId: " + walletId,null, null, null);
         }
         if (wallet.getBalance() < route.getPrice()) {
             return new TicketResponseDto(
                     getTime(), 400, "Bad Request",
-                    "Insufficient balance", null, null);
+                    "Insufficient balance", null, null, null);
         }
 
         TicketResponseDto bt = pressingPayment(-route.getPrice(), wallet.getWalletId());
@@ -48,7 +48,7 @@ public class ITicketServiceImpl implements ITicketService {
         if (bt == null) {
             return new TicketResponseDto(
                     getTime(), 200, "0k",
-                    "Sufficient balance", wallet.getCustomerId(), null);
+                    "Sufficient balance", wallet.getCustomerId(),null, null);
         }
         return bt;
     }
@@ -69,11 +69,11 @@ public class ITicketServiceImpl implements ITicketService {
             if(amount < 0) {
                 return new TicketResponseDto(
                         getTime(), 417, "Fail",
-                        "Payment processing fail", null, null);
+                        "Payment processing fail", null, null, null);
             }
             return new TicketResponseDto(
                     getTime(), 417, "Fail",
-                    "Refund processing fail", null, null);
+                    "Refund processing fail", null, null, null);
         }
         return null;
      }

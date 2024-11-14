@@ -32,7 +32,7 @@ public class WalletController {
     public ResponseEntity<ResponseDto> fund(@RequestBody WalletTransaction wt) {
         iWalletService.fundWallet(wt);
         return ResponseEntity.ok()
-                .body(new ResponseDto("201","Wallet funded successfully."));
+                .body(new ResponseDto(201,"Wallet funded successfully."));
     }
 
     @PutMapping("/wallet")
@@ -51,6 +51,6 @@ public class WalletController {
     public ResponseEntity<ResponseDto> transfer(@RequestBody FundTransferDto ft) {
         iWalletService.walletTransfer(ft);
         return ResponseEntity.ok()
-                .body(new ResponseDto("200","fund transferred successfully."));
+                .body(new ResponseDto(200,"fund transferred successfully."));
     }
 }

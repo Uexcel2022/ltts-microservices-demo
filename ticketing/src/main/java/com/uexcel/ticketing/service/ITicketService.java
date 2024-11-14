@@ -24,6 +24,7 @@ public interface ITicketService {
 
     /**
      * @param customerId - customer ID
+     * @param  correlationId - logging trace id
      * @return Returns ticket info with TicketDto
      */
     TicketResponseDto getTicket(String customerId, String correlationId);
@@ -32,7 +33,7 @@ public interface ITicketService {
      * @param ticketId - ticket id
      * @return Returns boolean values indicating success or fail
      */
-    boolean cancelTicket(String ticketId);
+    TicketResponseDto cancelTicket(String ticketId);
 
 
     /**
@@ -42,25 +43,5 @@ public interface ITicketService {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSZ");
         return formatter.format(usedDate);
     }
-
-    default void checkTicketStatus(Ticket ticket, TicketRepository ticketRepository) {
-
-        if(!ticket.getPurchasedDate().plusDays(366).isAfter(LocalDate.now())){
-            ticket.setStatus(EXPIRE);
-            ticketRepository.save(ticket);
-            throw  new InvalidInputException("Ticket has expired.");
-        }
-
-        if (ticket.getStatus().equalsIgnoreCase(USE)) {
-            throw new InvalidInputException(
-                    "The ticket was used on " + formatDate(ticket.getUsedDate()));
-        }
-
-        if (ticket.getStatus().equalsIgnoreCase(REFUND)) {
-            throw new InvalidInputException(
-                    "The ticket was refunded on " + formatDate(ticket.getUpdatedAt()));
-        }
-    }
-
 
     }

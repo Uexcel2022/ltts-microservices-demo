@@ -15,6 +15,8 @@ public class TicketResponseDto {
     private String description;
     private String message;
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String apiPath;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String customerId;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<TicketDto> ticket;

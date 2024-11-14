@@ -4,7 +4,6 @@ import com.uexcel.customer.dto.PostTicketDto;
 
 import org.springframework.cloud.openfeign.FeignClient;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -12,9 +11,13 @@ import org.springframework.web.bind.annotation.*;
 @FeignClient(value = "ticketing",fallback = TicketFeignClientFallback.class)
 public interface TicketFeignClient {
     @PostMapping(value = "/api/create-ticket",consumes = "application/json")
-    ResponseEntity<TicketResponseDto> createTicket(@RequestBody PostTicketDto postTicketDto,
+    TicketResponseDto createTicket(@RequestBody PostTicketDto postTicketDto,
                                                    @RequestHeader("saferideCorrelationId") String correlationId);
     @GetMapping("/api/fetch-ticket")
-    ResponseEntity<TicketResponseDto> getTicket(@RequestParam String customerId,
+    TicketResponseDto getTicket(@RequestParam String customerId,
                                               @RequestHeader("saferideCorrelationId") String correlationId);
+
+    @PutMapping("/api/cancel-ticket")
+    TicketResponseDto cancelTicket(@RequestParam String ticketId,
+                                                    @RequestHeader("saferideCorrelationId") String correlationId);
 }

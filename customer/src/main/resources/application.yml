@@ -16,6 +16,7 @@ spring:
       circuitbreaker:
         enabled: true
 
+
 management:
   info:
     env:
@@ -51,6 +52,7 @@ resilience4j:
         permitted-number-of-calls-in-half-open-state: 2
         failure-rate-threshold: 50
         wait-duration-in-open-state: 10000
+
 
 
 

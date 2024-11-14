@@ -3,7 +3,6 @@ package com.uexcel.ticketing.service.impl;
 
 import com.uexcel.ticketing.dto.*;
 import com.uexcel.ticketing.entity.Ticket;
-import com.uexcel.ticketing.exception.ResourceNoFoundException;
 import com.uexcel.ticketing.mapper.TicketMapper;
 import com.uexcel.ticketing.repositorty.TicketRepository;
 import com.uexcel.ticketing.service.ITicketService;
@@ -15,6 +14,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.chrono.ChronoLocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -48,7 +52,7 @@ public class ITicketServiceImpl implements ITicketService {
          logger.debug("createTicket:existing ticket: saferideCorrelation-id found: {}", correlationId);
          tickets.add(TicketMapper.mapToTicketDto(tk,ticketDto,postTicketDto));
          return new TicketResponseDto(new Date(),
-                 200,"Found", "You have unused ticket on this routed.", tickets);
+                 302,"Found", "You have unused ticket on this routed.",null, tickets);
      }
 
      Ticket newTicket = ticketRepository.save(TicketMapper.mapToTicket(new Ticket(),postTicketDto));
@@ -58,12 +62,12 @@ public class ITicketServiceImpl implements ITicketService {
           tickets.add(TicketMapper.mapToTicketDto(newTicket,ticketDto,postTicketDto));
           return new TicketResponseDto(new Date(),
                   201,"Created",
-                  "Ticket created successfully.", tickets);
+                  "Ticket created successfully.",null, tickets);
 
       }
         logger.debug("createTicket:failed: saferideCorrelation-id found: {}", correlationId);
          return new TicketResponseDto(new Date(),
-                500,"Fail", "Fail: ",null);
+                500,"Fail", "Fail: ",null,null);
     }
 
     /**
@@ -78,7 +82,7 @@ public class ITicketServiceImpl implements ITicketService {
         if(ticket.isEmpty()){
             return new TicketResponseDto(
                     new Date(),404,"Not Found",
-                    "Valid Ticket not found given input data customerId: "+customerId,null);
+                    "Valid Ticket not found given input data customerId: "+customerId,null,null);
         }
         List<TicketDto> ticketDtoList = new ArrayList<>();
         List<Integer> skippedRoutes = new ArrayList<>();
@@ -94,30 +98,50 @@ public class ITicketServiceImpl implements ITicketService {
         if(!skippedRoutes.isEmpty()){
             return new TicketResponseDto(
                     new Date(),200,"Ok",
-                    "Some routes may have been skipped. Refresh to get origin and destination.",ticketDtoList);
+                    "Some routes may have been skipped. Refresh to get origin and destination.",null,ticketDtoList);
         }
         return new TicketResponseDto(
-                new Date(),200,"Ok","Request processed successfully.",ticketDtoList);
+                new Date(),200,"Ok","Request processed successfully.",null,ticketDtoList);
     }
 
     /**
      * @param ticketId - ticket id
-     * @return Returns boolean values indicating success or fail
+     * @return  ticketResponseDto will hold status and ticket information
      */
     @Override
-    public boolean cancelTicket(String ticketId) {
-        Ticket ticket = ticketRepository.findById(ticketId)
-                .orElseThrow(()->new ResourceNoFoundException("Ticket","ticketId",ticketId));
+    public TicketResponseDto cancelTicket(String ticketId) {
+        Ticket ticket = ticketRepository.findById(ticketId).orElse(null);
+        if(ticket == null){
+            return new TicketResponseDto( new Date(),404,
+                    "Not Found","Ticket not found given input date ticketId: "+ticketId,null,null);
+        }
 
-        checkTicketStatus(ticket,ticketRepository);
-//        WalletDto walletDto = customerFeignClientFallback
-//                .fetchWallet();
+        if(!ticket.getPurchasedDate().plusDays(366).isAfter(LocalDate.now())){
+            ticket.setStatus(EXPIRE);
+            ticketRepository.save(ticket);
+                return new TicketResponseDto( new Date(),400,
+                        "Bad Request","Ticket "+ticketId+" has expired",null,null);
+        }
 
+        if (ticket.getStatus().equalsIgnoreCase(USE)) {
+            return new TicketResponseDto( new Date(), 400, "Bad Request",
+                    "The ticket was used on " + formatDate(ticket.getUsedDate()),null,null);
+        }
 
-//        walletBalance += ticket.getAmount();
+        if (ticket.getStatus().equalsIgnoreCase(REFUND)) {
+           return new   TicketResponseDto( new Date(), 400, "Bad Request",
+                    "The ticket was refunded on " + formatDate(ticket.getUpdatedAt()),null,null);
+        }
+
         ticket.setStatus(REFUND);
         ticketRepository.save(ticket);
-        return true;
+        TicketDto ticketDto = new TicketDto();
+        ticketDto.setAmount(ticket.getAmount());
+        List<TicketDto> ticketDtoList = new ArrayList<>();
+        ticketDtoList.add(ticketDto);
+        return new TicketResponseDto( new Date(),200,
+                "Ok","Ticket canceled successfully",ticket.getCustomerId(),ticketDtoList);
+
     }
 
 
